@@ -1,0 +1,263 @@
+@baseUrl = http://localhost:3000
+@token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODE5NDk2MzQsImV4cCI6MTc4MTk1MDUzNH0.IReZhKbFKxJmGNSnfhzZ9IpmK0yZbPLz-k60Q5jpkRo"
+
+### Health check
+GET {{baseUrl}}/
+
+### Auth - register
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "StrongP@ssw0rd!"
+}
+
+### Auth - confirm OTP
+POST {{baseUrl}}/api/auth/confirm-otp
+Content-Type: application/json
+
+{
+  "email": "abc@gmail.com",
+  "otp": "Iamabc@123"
+}
+
+### Auth - login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "abc@gmail.com",
+  "password": "Iamabc@123"
+}
+
+### Auth - request password-reset OTP
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "iamfake942@gmail.com"
+}
+
+### Auth - verify password-reset OTP
+# Save resetToken from this response only in frontend memory.
+POST {{baseUrl}}/api/auth/verify-forgot-password-otp
+Content-Type: application/json
+
+{
+  "email": "iamfake942@gmail.com",
+  "otp": "201523"
+}
+
+### Auth - reset password
+# This API intentionally does not accept an email or user ID.
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "resetToken": "cTyjSvHzZkvl5yY8mREIzgRvAsTrc8HcKOBrH0vorxU",
+  "password": "NewStrongP@ssw0rd!"
+}
+
+### Auth - Google login
+POST {{baseUrl}}/api/auth/google
+Content-Type: application/json
+
+{
+  "credential": "<GOOGLE_ID_TOKEN>"
+}
+
+### Auth - refresh token
+POST {{baseUrl}}/api/auth/refresh
+
+### Auth - logout
+POST {{baseUrl}}/api/auth/logout
+
+### Auth - current user
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### Products - list available products
+GET {{baseUrl}}/api/products?page=1&limit=12
+
+### Products - list available products price low to high
+GET {{baseUrl}}/api/products?page=1&limit=12&price=low-to-high
+
+### Products - list available products price high to low
+GET {{baseUrl}}/api/products?page=1&limit=12&price=high-to-low
+
+### Products - list by brand
+GET {{baseUrl}}/api/products/brand/samsung
+
+### Products - product details
+GET {{baseUrl}}/api/products/vivo-x300-fe-5g-512-gb-12-gb-ram-noir-black-mobile-phone-mowuvm-10060595
+
+### Products - search
+GET {{baseUrl}}/api/products/search/query?q=iphone
+
+### Brands - list brands
+GET {{baseUrl}}/api/brands
+
+### Brands - products by brand
+GET {{baseUrl}}/api/brands/<brand-slug>/products
+
+### Cart - get cart
+GET {{baseUrl}}/api/cart
+Authorization: Bearer {{token}}
+
+### Cart - add item
+POST {{baseUrl}}/api/cart/items/19fd08a4-4ee8-4e14-8d20-cc6b08ff
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "product_id": "<product-id>",
+  "quantity": 1
+}
+
+### Cart - update item quantity
+PATCH {{baseUrl}}/api/cart/items/<product-id>
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "quantity": 2
+}
+
+### Cart - remove item
+DELETE {{baseUrl}}/api/cart/items/<product-id>
+Authorization: Bearer {{token}}
+
+### Cart - clear cart
+DELETE {{baseUrl}}/api/cart
+Authorization: Bearer {{token}}
+
+### Orders - place COD order
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODMwOTk0NDIsImV4cCI6MTc4MzEwMDM0Mn0.A7YllYnzgygV-mVESnSMWwYDce5nQXGJWbqkiifLiIQ
+
+{
+  "payment_method": "COD",
+  "shipping_address_id": 1,
+  "items": [
+    {
+      "product_id": "012b1b03-9b05-4449-abc8-ad4e317816f9",
+      "quantity": 1
+    }
+  ]
+}
+
+### Orders - place UPI order through Pine Labs checkout
+# Response contains redirect_url. Frontend should open that URL.
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODMxMDI5OTAsImV4cCI6MTc4MzEwMzg5MH0.lK7HV31siijl6OeBioUxr8-RBaz64PvbRUEhmsULfJc
+
+{
+  "payment_method": "CARD",
+  "shipping_address_id": 1,
+  "items": [
+    {
+      "product_id": "b3e4cadb-9639-4b7f-966e-319fcd307587",
+      "quantity": 1
+    }
+  ]
+}
+
+### Orders - place CARD order through Pine Labs checkout
+# Response contains redirect_url. Frontend should open that URL.
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "payment_method": "CARD",
+  "shipping_address_id": 1,
+  "items": [
+    {
+      "product_id": "PRODUCT_ID",
+      "quantity": 1
+    }
+  ]
+}
+
+### Orders - status
+GET {{baseUrl}}/api/orders/1/status
+Authorization: Bearer {{token}}
+
+### Pine Labs - callback
+POST {{baseUrl}}/api/payments/pinelabs/callback
+Content-Type: application/json
+X-PineLabs-Signature: signature_from_pinelabs
+
+{
+  "pinelabs_order_id": "PINELABS_ORDER_ID"
+}
+
+### Profile - get profile
+GET {{baseUrl}}/api/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODE5NDk2MzQsImV4cCI6MTc4MTk1MDUzNH0.IReZhKbFKxJmGNSnfhzZ9IpmK0yZbPLz-k60Q5jpkRo
+
+### Profile - update name
+PUT {{baseUrl}}/api/profile
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "John Updated"
+}
+
+### Profile - list addresses
+GET {{baseUrl}}/api/profile/addresses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODE5NTA5ODUsImV4cCI6MTc4MTk1MTg4NX0.IzostgfS2kWGsVAAHnT9zcUnWXN8AyWfl8bITHxWmHA
+
+### Profile - reverse geocode address from coordinates
+# 
+GET {{baseUrl}}/api/profile/address-from-coords?lat=21.154131557416715&lng=72.86693530931342
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhYmNAZ21haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3ODE5NTA5ODUsImV4cCI6MTc4MTk1MTg4NX0.IzostgfS2kWGsVAAHnT9zcUnWXN8AyWfl8bITHxWmHA
+
+
+### Profile - create address
+POST {{baseUrl}}/api/profile/addresses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "Home",
+  "address_line1": "123 Main Street",
+  "address_line2": "Apt 4B",
+  "city": "Surat",
+  "state": "Gujarat",
+  "postal_code": "400001",
+  "country": "India",
+  "latitude": 19.0760,
+  "longitude": 72.8777,
+  "is_default": false
+}
+
+### Profile - update address
+PUT {{baseUrl}}/api/profile/addresses/<address-id>
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "Office",
+  "address_line1": "456 Business Park",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "postal_code": "411001",
+  "country": "India",
+  "latitude": 18.5204,
+  "longitude": 73.8567,
+  "is_default": false
+}
+
+### Profile - delete address
+DELETE {{baseUrl}}/api/profile/addresses/<address-id>
+Authorization: Bearer {{token}}
+
+### Profile - set default address
+PATCH {{baseUrl}}/api/profile/addresses/<address-id>/default
+Authorization: Bearer {{token}}

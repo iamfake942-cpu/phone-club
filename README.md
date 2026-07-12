@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PhoneClub
 
 
@@ -91,3 +92,54 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+=======
+# Phone Club Backend
+
+Express API backed by MySQL and Redis. Node.js 22 or newer is recommended.
+
+## Local development
+
+Copy `.env.example` to `.env`, fill in the required values, install dependencies, and start the API:
+
+```bash
+cp .env.example .env
+npm ci
+npm start
+```
+
+The API listens on `http://localhost:5000` by default. MySQL schema files are in `migrations/` and must be applied in numeric order. Because the existing SQL files select the `phone_club` database, create/use that database locally or adapt a copy of the scripts for a differently named database.
+
+```bash
+for migration in migrations/*.sql; do mysql -u root -p < "$migration"; done
+```
+
+## Docker
+
+Build and run the production image with local services reachable through values in `.env`:
+
+```bash
+docker build -t phone-club-backend .
+docker run --rm -p 5000:5000 --env-file .env phone-club-backend
+curl http://localhost:5000/health
+curl http://localhost:5000/health/database
+```
+
+When MySQL or Redis runs on the host, use a host name the container can resolve (for example `host.docker.internal` on Docker Desktop), rather than `localhost`.
+
+## Railway deployment
+
+1. Push the project to GitHub, create a Railway project, choose **Deploy from GitHub repo**, and select the repository. Railway will detect the root `Dockerfile`.
+2. Add Railway MySQL and Redis services, or connect compatible existing services. Reference their private connection variables from the backend service as `DATABASE_URL` and `REDIS_URL`. Do not paste secrets into source control.
+3. Configure the backend variables listed in `.env.example`. Production requires `NODE_ENV=production`, `DATABASE_URL` (or all of `DB_HOST`, `DB_USER`, `DB_PASSWORD`, and `DB_NAME`), `REDIS_URL` (or `REDIS_HOST`), `JWT_ACCESS_SECRET`, and `JWT_REFRESH_SECRET`. Set `FRONTEND_URL` or comma-separated `ALLOWED_ORIGINS` to the deployed frontend origins. Set SMTP, Google, and Pine Labs variables for the corresponding features.
+4. Generate a public domain for the backend in Railway networking settings. Set the service health-check path to `/health`.
+5. Apply the SQL files in `migrations/` in numeric order to the provisioned MySQL database before serving traffic. Railway's MySQL data tab/client or a local MySQL client connected through a Railway TCP proxy can run them. Review the `USE phone_club` statements if the provisioned database name differs. There is no automated migration command in this project.
+6. Update Pine Labs callback variables with the generated HTTPS domain when payments are enabled, then redeploy.
+7. Test the deployment (replace the placeholder only in your shell):
+
+```bash
+curl https://your-generated-domain.example/health
+curl https://your-generated-domain.example/health/database
+```
+
+Railway supplies `PORT`; do not define it unless there is a specific need. `/health` deliberately does not contact MySQL, Redis, email, or payment providers, while `/health/database` tests the shared MySQL pool.
+>>>>>>> 88a44e0 (added-phone-club-be)

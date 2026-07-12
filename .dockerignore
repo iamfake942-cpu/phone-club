@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+coverage
+logs
+*.log
+README.md
+api.http
+AUTH_SETUP.md
+FRONTEND_ORDER_JOURNEY_PROMPT.md
+examples
