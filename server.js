@@ -24,10 +24,16 @@ function validateEnvironment() {
   }
 }
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_URL || "http://localhost:5173")
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.ALLOWED_ORIGINS,
+  process.env.NODE_ENV === "production" ? "" : "http://localhost:5173",
+]
+  .filter(Boolean)
+  .join(",")
   .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+  .map((origin) => origin.trim().replace(/\/$/, ""))
+  .filter((origin, index, origins) => origin && origins.indexOf(origin) === index);
 
 app.set("trust proxy", 1);
 
@@ -35,7 +41,8 @@ app.use(helmet());
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      const normalizedOrigin = origin?.replace(/\/$/, "");
+      if (!origin || allowedOrigins.includes(normalizedOrigin)) return callback(null, true);
       const error = new Error("Origin is not allowed by CORS");
       error.statusCode = 403;
       return callback(error);
