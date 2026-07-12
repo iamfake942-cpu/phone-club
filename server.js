@@ -32,7 +32,12 @@ const allowedOrigins = [
   .filter(Boolean)
   .join(",")
   .split(",")
-  .map((origin) => origin.trim().replace(/\/$/, ""))
+  .map((origin) =>
+    origin
+      .trim()
+      .replace(/^["']|["']$/g, "")
+      .replace(/\/+$/, "")
+  )
   .filter((origin, index, origins) => origin && origins.indexOf(origin) === index);
 
 app.set("trust proxy", 1);
@@ -41,7 +46,7 @@ app.use(helmet());
 app.use(
   cors({
     origin(origin, callback) {
-      const normalizedOrigin = origin?.replace(/\/$/, "");
+      const normalizedOrigin = origin?.replace(/\/+$/, "");
       if (!origin || allowedOrigins.includes(normalizedOrigin)) return callback(null, true);
       const error = new Error("Origin is not allowed by CORS");
       error.statusCode = 403;
@@ -115,6 +120,7 @@ let shuttingDown = false;
 
 async function start() {
   validateEnvironment();
+  console.log(`Configured CORS origins: ${allowedOrigins.join(", ") || "none"}`);
   server = app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
   });
