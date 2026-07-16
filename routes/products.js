@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const productSearchController = require("../controllers/productSearch.controller");
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 100;
+
+router.get(["/search", "/search/query"], productSearchController.autocomplete);
 
 function parsePositiveInteger(value, fallback) {
   const parsed = Number.parseInt(value, 10);
@@ -293,40 +296,6 @@ router.get("/:slug", async (req, res) => {
     console.error(error);
     res.status(500).json({
       message: "Failed to fetch product details",
-    });
-  }
-});
-
-/*
-SEARCH
-*/
-router.get("/search/query", async (req, res) => {
-  try {
-    const q = req.query.q || "";
-
-    const [rows] = await db.query(
-      `
-      SELECT
-          id,
-          name,
-          slug,
-          selling_price,
-          mrp
-
-      FROM products
-
-      WHERE name LIKE ?
-
-      LIMIT 20
-      `,
-      [`%${q}%`]
-    );
-
-    res.json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Search failed",
     });
   }
 });

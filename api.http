@@ -94,7 +94,7 @@ GET {{baseUrl}}/api/products/brand/samsung
 GET {{baseUrl}}/api/products/vivo-x300-fe-5g-512-gb-12-gb-ram-noir-black-mobile-phone-mowuvm-10060595
 
 ### Products - search
-GET {{baseUrl}}/api/products/search/query?q=iphone
+GET {{baseUrl}}/api/products/search/query?q=apple
 
 ### Brands - list brands
 GET {{baseUrl}}/api/brands
